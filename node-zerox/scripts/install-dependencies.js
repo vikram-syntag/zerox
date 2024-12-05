@@ -29,6 +29,7 @@ const isSudoAvailable = async () => {
 const checkAndInstall = async () => {
   try {
     const sudoAvailable = await isSudoAvailable();
+    const isVercel = !!process.env.VERCEL;
 
     // Check and install Ghostscript
     try {
@@ -37,10 +38,14 @@ const checkAndInstall = async () => {
       if (process.platform === "darwin") {
         await installPackage("brew install ghostscript", "Ghostscript");
       } else if (process.platform === "linux") {
-        const command = sudoAvailable
-          ? "sudo apt-get update && sudo apt-get install -y ghostscript"
-          : "apt-get update && apt-get install -y ghostscript";
-        await installPackage(command, "Ghostscript");
+        if (isVercel) {
+          console.log("Vercel detected: Skipping Ghostscript installation.");
+        } else {
+          const command = sudoAvailable
+            ? "sudo yum update -y && sudo yum install -y ghostscript"
+            : "yum update -y && yum install -y ghostscript";
+          await installPackage(command, "Ghostscript");
+        }
       } else {
         throw new Error(
           "Please install Ghostscript manually from https://www.ghostscript.com/download.html"
@@ -55,10 +60,14 @@ const checkAndInstall = async () => {
       if (process.platform === "darwin") {
         await installPackage("brew install graphicsmagick", "GraphicsMagick");
       } else if (process.platform === "linux") {
-        const command = sudoAvailable
-          ? "sudo apt-get update && sudo apt-get install -y graphicsmagick"
-          : "apt-get update && apt-get install -y graphicsmagick";
-        await installPackage(command, "GraphicsMagick");
+        if (isVercel) {
+          console.log("Vercel detected: Skipping GraphicsMagick installation.");
+        } else {
+          const command = sudoAvailable
+            ? "sudo yum update -y && sudo yum install -y graphicsmagick"
+            : "yum update -y && yum install -y graphicsmagick";
+          await installPackage(command, "GraphicsMagick");
+        }
       } else {
         throw new Error(
           "Please install GraphicsMagick manually from http://www.graphicsmagick.org/download.html"
@@ -73,10 +82,14 @@ const checkAndInstall = async () => {
       if (process.platform === "darwin") {
         await installPackage("brew install --cask libreoffice", "LibreOffice");
       } else if (process.platform === "linux") {
-        const command = sudoAvailable
-          ? "sudo apt-get update && sudo apt-get install -y libreoffice"
-          : "apt-get update && apt-get install -y libreoffice";
-        await installPackage(command, "LibreOffice");
+        if (isVercel) {
+          console.log("Vercel detected: Skipping LibreOffice installation.");
+        } else {
+          const command = sudoAvailable
+            ? "sudo yum update -y && sudo yum install -y libreoffice"
+            : "yum update -y && yum install -y libreoffice";
+          await installPackage(command, "LibreOffice");
+        }
       } else {
         throw new Error(
           "Please install LibreOffice manually from https://www.libreoffice.org/download/download/"
@@ -88,5 +101,6 @@ const checkAndInstall = async () => {
     process.exit(1);
   }
 };
+
 
 checkAndInstall();
