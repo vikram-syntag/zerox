@@ -5,6 +5,7 @@
   "main": "node-zerox/dist/index.js",
   "scripts": {
     "build": "tsc -p node-zerox/tsconfig.json",
+    "prepare": "npm run build",
     "postinstall": "node node-zerox/scripts/install-dependencies.js",
     "prepublishOnly": "npm run build",
     "test": "ts-node node-zerox/tests/index.ts"
