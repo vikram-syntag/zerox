@@ -1,6 +1,5 @@
 import {
   addWorkersToTesseractScheduler,
-  cleanupImage,
   convertFileToPdf,
   convertPdfToImages,
   downloadFile,
@@ -119,18 +118,18 @@ export const zerox = async ({
     } else if (correctOrientation) {
       const imageBuffer = await fs.readFile(localPath);
 
-      const correctedBuffer = await cleanupImage({
-        correctOrientation,
-        imageBuffer,
-        scheduler,
-        trimEdges,
-      });
+      // const correctedBuffer = await cleanupImage({
+      //   correctOrientation,
+      //   imageBuffer,
+      //   scheduler,
+      //   trimEdges,
+      // });
 
       const imagePath = path.join(
         processedDirectory,
         `${path.basename(localPath, path.extname(localPath))}_clean.png`
       );
-      await fs.writeFile(imagePath, correctedBuffer);
+      await fs.writeFile(imagePath, imageBuffer);
     }
 
     const endOfPath = localPath.split("/")[localPath.split("/").length - 1];

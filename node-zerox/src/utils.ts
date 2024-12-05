@@ -8,7 +8,6 @@ import axios from "axios";
 import fs from "fs-extra";
 import mime from "mime-types";
 import path from "path";
-import sharp from "sharp";
 import { NUM_STARTING_WORKERS } from "./constants";
 import { v4 as uuidv4 } from "uuid";
 
@@ -181,26 +180,26 @@ export const downloadFile = async ({
 
 // Determine the optimal image orientation based on OCR confidence
 // Run Tesseract on 4 image orientations and compare the outputs
-const determineOptimalRotation = async ({
-  image,
-  scheduler,
-}: {
-  image: sharp.Sharp;
-  scheduler: Tesseract.Scheduler;
-}): Promise<number> => {
-  const imageBuffer = await image.toBuffer();
-  const {
-    data: { orientation_confidence, orientation_degrees },
-  } = await scheduler.addJob("detect", imageBuffer);
+// const determineOptimalRotation = async ({
+//   image,
+//   scheduler,
+// }: {
+//   image: sharp.Sharp;
+//   scheduler: Tesseract.Scheduler;
+// }): Promise<number> => {
+//   const imageBuffer = await image.toBuffer();
+//   const {
+//     data: { orientation_confidence, orientation_degrees },
+//   } = await scheduler.addJob("detect", imageBuffer);
 
-  if (orientation_degrees) {
-    console.log(
-      `Reorienting image ${orientation_degrees} degrees (confidence: ${orientation_confidence}%)`
-    );
-    return orientation_degrees;
-  }
-  return 0;
-};
+//   if (orientation_degrees) {
+//     console.log(
+//       `Reorienting image ${orientation_degrees} degrees (confidence: ${orientation_confidence}%)`
+//     );
+//     return orientation_degrees;
+//   }
+//   return 0;
+// };
 
 // Convert each page to a png, correct orientation, and save that image to tmp
 export const convertPdfToImages = async ({
@@ -275,18 +274,18 @@ export const convertPdfToImages = async ({
         if (!result.page) throw new Error("Could not identify page data");
         const paddedPageNumber = result.page.toString().padStart(5, "0");
 
-        const correctedBuffer = await cleanupImage({
-          correctOrientation,
-          imageBuffer: result.buffer,
-          scheduler,
-          trimEdges,
-        });
+        // const correctedBuffer = await cleanupImage({
+        //   correctOrientation,
+        //   imageBuffer: result.buffer,
+        //   scheduler,
+        //   trimEdges,
+        // });
 
         const imagePath = path.join(
           tempDir,
           `${options.saveFilename}_page_${paddedPageNumber}.png`
         );
-        await fs.writeFile(imagePath, correctedBuffer);
+        await fs.writeFile(imagePath, result.buffer);
       })
     );
     return convertResults;
@@ -335,33 +334,33 @@ export const convertKeysToSnakeCase = (
   );
 };
 
-export const cleanupImage = async ({
-  correctOrientation,
-  imageBuffer,
-  scheduler,
-  trimEdges,
-}: CleanupImageProps) => {
-  const image = sharp(imageBuffer);
+// export const cleanupImage = async ({
+//   correctOrientation,
+//   imageBuffer,
+//   scheduler,
+//   trimEdges,
+// }: CleanupImageProps) => {
+//   const image = sharp(imageBuffer);
 
-  // Trim extra space around the content in the image
-  if (trimEdges) {
-    image.trim();
-  }
+//   // Trim extra space around the content in the image
+//   if (trimEdges) {
+//     image.trim();
+//   }
 
-  // scheduler would always be non-null if correctOrientation is true
-  // Adding this check to satisfy typescript
-  if (correctOrientation && scheduler) {
-    const optimalRotation = await determineOptimalRotation({
-      image,
-      scheduler,
-    });
+//   // scheduler would always be non-null if correctOrientation is true
+//   // Adding this check to satisfy typescript
+//   if (correctOrientation && scheduler) {
+//     const optimalRotation = await determineOptimalRotation({
+//       image,
+//       scheduler,
+//     });
 
-    if (optimalRotation) {
-      image.rotate(optimalRotation);
-    }
-  }
+//     if (optimalRotation) {
+//       image.rotate(optimalRotation);
+//     }
+//   }
 
-  // Correct the image orientation
-  const correctedBuffer = await image.toBuffer();
-  return correctedBuffer;
-};
+//   // Correct the image orientation
+//   const correctedBuffer = await image.toBuffer();
+//   return correctedBuffer;
+// };
