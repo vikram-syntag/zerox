@@ -36,7 +36,6 @@ const createAndAddWorker = async (scheduler: Tesseract.Scheduler) => {
   const worker = await Tesseract.createWorker("eng", 2, {
     legacyCore: true,
     legacyLang: true,
-    corePath: '/_next/static/wasm/tesseract-core-simd.wasm',
   });
 
   await worker.setParameters({
